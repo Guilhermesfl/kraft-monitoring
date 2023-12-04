@@ -15,4 +15,6 @@ scrape_configs:
       - targets: ["localhost:9090"]
   - job_name: "kafka"
     static_configs:
-      - targets: ["kafka-exporter:9308"]
+      - targets:
+        - jmx-exporter-broker:5556
+        - jmx-exporter-controller:5556
