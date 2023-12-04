@@ -1,11 +1,25 @@
 version: "3"
 services:
-  kafka-exporter:
-    image: bitnami/kafka-exporter:1.7.0
+  jmx-exporter-broker:
+    image: bitnami/jmx-exporter:0.20.0
+    volumes:
+      - ./exporter/exporter-brokers.yml:/opt/bitnami/jmx-exporter/exporter.yml
     command:
-      - "--kafka.server=broker-1:9092"
+      - "5556"
+      - exporter.yml
     ports:
-      - 9308:9308
+      - 9999:5556
+    networks:
+      - monitoring
+  jmx-exporter-controller:
+    image: bitnami/jmx-exporter:0.20.0
+    volumes:
+      - ./exporter/exporter-controllers.yml:/opt/bitnami/jmx-exporter/exporter.yml
+    command:
+      - "5556"
+      - exporter.yml
+    ports:
+      - 9998:5556
     networks:
       - monitoring
   prometheus:
@@ -14,6 +28,14 @@ services:
       - ./prometheus/prometheus.yml:/opt/bitnami/prometheus/conf/prometheus.yml
     ports:
       - 9099:9090
+    networks:
+      - monitoring
+  grafana:
+    image: grafana/grafana:10.2.2
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    ports:
+      - 3000:3000
     networks:
       - monitoring
 
